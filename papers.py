@@ -28,18 +28,27 @@ def decide(input_file, watchlist_file, countries_file):
         an entry or transit visa is required, and whether there is currently a medical advisory
     :return: List of strings. Possible values of strings are: "Accept", "Reject", "Secondary", and "Quarantine"
     """
+    mark = 0
+    result = []
+
     with open(input_file) as file_reader:
         test_file = file_reader.read()
         test_file = json.loads(test_file)
+        print(test_file)
+        print(len(test_file))
     with open(watchlist_file) as file_reader:
         watchlist = file_reader.read()
         watchlist = json.loads(watchlist)
+        print(watchlist)
+        print(type(watchlist))
     with open(countries_file) as file_reader:
         country_list = file_reader.read()
         country_list = json.loads(country_list)
+        print(country_list)
+        print(type(country_list))
 
 
-    return ["Reject"]
+    return result
 
 
 def valid_passport_format(passport_number):
@@ -73,4 +82,4 @@ def valid_date_format(date_string):
         raise ValueError("Incorrect length")
 
 
-decide("test_quarantine.json","watchlist.json","countries.json");
+print(decide("test_quarantine.json","watchlist.json","countries.json"))
