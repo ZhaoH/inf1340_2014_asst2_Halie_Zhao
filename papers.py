@@ -30,6 +30,19 @@ def decide(input_file, watchlist_file, countries_file):
     """
     return ["Reject"]
 
+def passport_attributes_complete(valid_passport_format, valid_date_format, valid_name_format, valid_location_format, valid_entry_format):
+    """
+
+    :param valid_passport_format:
+    :param valid_date_format:
+    :param valid_name_format:
+    :param valid_location_format:
+    :param valid_entry_format:
+    :return:
+    """
+    # Determines whether all attributes (First Name, Last Name, Birth Date, Passport Number, Home Location, From Location, Reason for Entry)
+    # are complete, returns True
+    # call valid_date_format and valid_passport_format
 
 def valid_passport_format(passport_number):
     """
@@ -43,7 +56,10 @@ def valid_passport_format(passport_number):
         return True
     else:
         return False
-
+    if type(passport_number) is not str:
+        raise TypeError("Invalid Type")
+    if len(passport_number) != 25:
+        raise ValueError("Incorrect length")
 
 def valid_date_format(date_string):
     """
@@ -60,3 +76,55 @@ def valid_date_format(date_string):
         raise TypeError("Invalid Type")
     if len(date_string) != 8:
         raise ValueError("Incorrect length")
+
+def valid_name_format(first_name, last_name):
+    """
+    Checks whether first name and last name are both complete strings and both use alphabetical characters
+    :param first_name: alphabetical string
+    :param last_name: alphabetical string
+    :return: Boolean; True if valid, False otherwise
+    """
+
+    if (len(first_name), len(last_name)) > 1:
+        return True
+    else:
+        return False
+    if (type(first_name), type(last_name)) != (str, str):
+        raise TypeError("Invalid Type: Names must be strings")
+    if (first_name.isalpha()) and (last_name.isalpha()):
+        return True
+    else:
+        return False
+
+def valid_location_format(home_location, from_location):
+    """
+    Checks whether home location and from location are on list of existing countries
+    :param home_location: predetermined 3-letter country code
+    :param from_location: predetermined 3-letter country code
+    :return: Boolean; True if valid, False otherwise
+    """
+
+    preapproved_countries = ("ALB", "BRD", "CFR", "DSK", "ELE", "FRY", "GOR", "HJR",\
+                 "III", "JIK", "KAN", "KRA", "LUG")
+    if home_location in preapproved_countries:
+        return True
+    else:
+        return False
+    if from_location in preapproved_countries:
+        return True
+    else:
+        return False
+
+
+def valid_entry_format(entry_reason):
+    """
+    Checks whether reason for entry either returning, transit, or visa
+    :param entry_reason: returning, transit, or visa
+    :return: Boolean; True if valid, False otherwise
+    """
+
+    reasons_for_entry = ("returning", "transit", "visa")
+    if entry_reason in reasons_for_entry:
+        return True
+    else:
+        return False
