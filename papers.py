@@ -57,10 +57,10 @@ def valid_passport_format(passport_number):
         return True
     else:
         return False
-  # if type(passport_number) is not str:
-    #    raise TypeError("Invalid Type")
-    # if len(passport_number) != 25:
-     #   raise ValueError("Incorrect length")
+    if type(passport_number) is not str:
+        raise TypeError("Invalid Type")
+    if len(passport_number) != 25:
+        raise ValueError("Incorrect length")
 
 def valid_date_format(date_string):
     """
@@ -72,12 +72,11 @@ def valid_date_format(date_string):
         datetime.datetime.strptime(date_string, '%Y-%m-%d')
         return True
     except ValueError:
-        if type(date_string) is not str:
-            raise TypeError("Invalid Type")
-        if len(date_string) != 8:
-            raise ValueError("Incorrect length")
         return False
-
+    if type(date_string) is not str:
+        raise TypeError("Invalid Type")
+    if len(date_string) != 8:
+        raise ValueError("Incorrect length")
 
 def valid_name_format(first_name, last_name):
     """
@@ -87,12 +86,16 @@ def valid_name_format(first_name, last_name):
     :return: Boolean; True if valid, False otherwise
     """
 
-    if (len(first_name), len(last_name)) > 1 and (type(first_name), type(last_name)) = (str, str) and (first_name.isalpha()) and (last_name.isalpha()):
+    if (len(first_name), len(last_name)) > 1 and (type(first_name), type(last_name)) != (str, str):
         return True
     else:
         return False
-
-       # raise TypeError("Invalid Type: Names must be strings")
+    #if (type(first_name), type(last_name)) != (str, str):
+        #raise TypeError("Invalid Type: Names must be strings")
+    if (first_name.isalpha()) and (last_name.isalpha()):
+        return True
+    else:
+        return False
 
 def valid_location_format(home_location, from_location):
     """
@@ -104,10 +107,15 @@ def valid_location_format(home_location, from_location):
 
     preapproved_countries = ("ALB", "BRD", "CFR", "DSK", "ELE", "FRY", "GOR", "HJR",\
                  "III", "JIK", "KAN", "KRA", "LUG")
-    if home_location in preapproved_countries and from_location in preapproved_countries:
+    if home_location in preapproved_countries:
         return True
     else:
         return False
+    if from_location in preapproved_countries:
+        return True
+    else:
+        return False
+
 
 def valid_entry_format(entry_reason):
     """
