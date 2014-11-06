@@ -29,8 +29,59 @@ def decide(input_file, watchlist_file, countries_file):
         an entry or transit visa is required, and whether there is currently a medical advisory
     :return: List of strings. Possible values of strings are: "Accept", "Reject", "Secondary", and "Quarantine"
     """
-    return ["Reject"]
+    mark = 0
+    result = []
 
+    with open(input_file) as file_reader:
+        test_file = file_reader.read()
+        test_file = json.loads(test_file)
+        print(test_file)
+        print(len(test_file))
+    with open(watchlist_file) as file_reader:
+        watchlist = file_reader.read()
+        watchlist = json.loads(watchlist)
+        print(watchlist)
+        print(type(watchlist))
+    with open(countries_file) as file_reader:
+        country_list = file_reader.read()
+        country_list = json.loads(country_list)
+        print(country_list)
+        print(type(country_list))
+
+    for entry in test_file:
+        for country_key, country_val in country_list.items():
+            # Quarantine Scenario
+            if entry["from"]["country"].upper() == country_key and \
+                    country_val["medical_advisory"]:
+                result += ["Quarantine"]
+            # Visit and Transit Scenario
+            elif entry["home"]["country"].upper() == country_key:
+                if int(country_val["vistor_visa_required"]) and \
+                        entry["entry_reason"] == "visit":
+                        print("check visitor visa")
+                elif int(country_val["transit_visa_required"])and \
+                        entry["entry_reason"] == "transit":
+                        print("check transit visa")
+
+    '''
+
+
+    for data in file_contents:
+
+            if valid_passport_format(data["passport"]): #check to see if
+            # passport format is right
+                if valid_date_format(data["birth_date"]): #check to see date
+                # format is right
+
+
+                    for country in country_list:
+                        if data["from"]["country"] == country:
+                            if country["medical_history"]: # Quarantine scenario
+                                return ["Quarantine"]
+                            else:
+                                with
+'''
+    return result
 def passport_attributes_complete(valid_passport_format, valid_date_format, valid_name_format, valid_location_format, valid_entry_format):
     """
 
