@@ -17,6 +17,7 @@ import re
 import datetime
 import json
 
+#test
 
 def decide(input_file, watchlist_file, countries_file):
     """
