@@ -29,14 +29,14 @@ def decide(input_file, watchlist_file, countries_file):
         an entry or transit visa is required, and whether there is currently a medical advisory
     :return: List of strings. Possible values of strings are: "Accept", "Reject", "Secondary", and "Quarantine"
     """
-    mark = 0
+    mark = ""
     result = []
 
     with open(input_file) as file_reader:
         test_file = file_reader.read()
         test_file = json.loads(test_file)
         print(test_file)
-        print(len(test_file))
+        print(type(test_file))
     with open(watchlist_file) as file_reader:
         watchlist = file_reader.read()
         watchlist = json.loads(watchlist)
@@ -49,39 +49,47 @@ def decide(input_file, watchlist_file, countries_file):
         print(type(country_list))
 
     for entry in test_file:
-        for country_key, country_val in country_list.items():
-            # Quarantine Scenario
-            if entry["from"]["country"].upper() == country_key and \
-                    country_val["medical_advisory"]:
-                result += ["Quarantine"]
-            # Visit and Transit Scenario
-            elif entry["home"]["country"].upper() == country_key:
-                if int(country_val["vistor_visa_required"]) and \
-                        entry["entry_reason"] == "visit":
+        #if not passport_attributes_complete():
+            #result += ["Reject"]
+        #else:
+            for country_key, country_val in country_list.items():
+                # Quarantine Scenario
+                if entry["from"]["country"].upper() == country_key and \
+                        country_val["medical_advisory"]:
+                    mark = "Quarantine"
+                # Visit and Transit Scenario
+                elif entry["home"]["country"].upper() == country_key:
+                    if int(country_val["vistor_visa_required"]) and \
+                            entry["entry_reason"] == "visit":
                         print("check visitor visa")
-                elif int(country_val["transit_visa_required"])and \
-                        entry["entry_reason"] == "transit":
+                    elif int(country_val["transit_visa_required"])and \
+                            entry["entry_reason"] == "transit":
                         print("check transit visa")
 
-    '''
+            if mark != "Quarantine":
+                # check to see if is a returning citizen
+                if entry["entry_reason"] == "returning" and entry["home"][
+                        "country"].upper() == "KAN":
+                    mark = "Accept"
 
+                # check to see if in watchlist
+                for info in watchlist:
+                    if entry["passport"].upper() == info["passport"].upper() \
+                            or(entry["first_name"].upper() == info[
+                                "first_name"].upper() and entry[
+                                    "last_name"].upper() == info[
+                                        "last_name"].upper()):
+                        mark = "Secondary"
 
-    for data in file_contents:
+            result += mark
+            mark = ""
 
-            if valid_passport_format(data["passport"]): #check to see if
-            # passport format is right
-                if valid_date_format(data["birth_date"]): #check to see date
-                # format is right
-
-
-                    for country in country_list:
-                        if data["from"]["country"] == country:
-                            if country["medical_history"]: # Quarantine scenario
-                                return ["Quarantine"]
-                            else:
-                                with
-'''
     return result
+
+
+    return result
+
+
 def passport_attributes_complete(valid_passport_format, valid_date_format, valid_name_format, valid_location_format, valid_entry_format):
     """
 
@@ -99,7 +107,7 @@ def passport_attributes_complete(valid_passport_format, valid_date_format, valid
 def valid_passport_format(passport_number):
     """
     Checks whether a passport number is five sets of five alpha-number characters separated by dashes
-    :param passport_number: alpha-numeric string
+     :param passport_number: alpha-numeric string
     :return: Boolean; True if the format is valid, False otherwise
     """
     passport_format = re.compile('.{5}-.{5}-.{5}-.{5}-.{5}')
@@ -180,3 +188,6 @@ def valid_entry_format(entry_reason):
         return True
     else:
         return False
+
+
+decide("test_quarantine.json","watchlist.json","countries.json")
