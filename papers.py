@@ -17,7 +17,6 @@ import re
 import datetime
 import json
 
-#test
 
 def decide(input_file, watchlist_file, countries_file):
     """
@@ -29,34 +28,43 @@ def decide(input_file, watchlist_file, countries_file):
         an entry or transit visa is required, and whether there is currently a medical advisory
     :return: List of strings. Possible values of strings are: "Accept", "Reject", "Secondary", and "Quarantine"
     """
+
     mark = ""
     result = []
 
-    with open(input_file) as file_reader:
-        test_file = file_reader.read()
-        test_file = json.loads(test_file)
-        print(test_file)
-        print(type(test_file))
-    with open(watchlist_file) as file_reader:
-        watchlist = file_reader.read()
-        watchlist = json.loads(watchlist)
-        print(watchlist)
-        print(type(watchlist))
-    with open(countries_file) as file_reader:
-        country_list = file_reader.read()
-        country_list = json.loads(country_list)
-        print(country_list)
-        print(type(country_list))
+    try:
+        with open(input_file) as file_reader:
+            test_file = file_reader.read()
+            test_file = json.loads(test_file)
+            print(test_file)
+            print(type(test_file))
+        with open(watchlist_file) as file_reader:
+            watchlist = file_reader.read()
+            watchlist = json.loads(watchlist)
+            print(watchlist)
+            print(type(watchlist))
+        with open(countries_file) as file_reader:
+            country_list = file_reader.read()
+            country_list = json.loads(country_list)
+            print(country_list)
+            print(type(country_list))
+    except:
+        print("File not found")
+        raise FileNotFoundError
 
     for entry in test_file:
-        #if not passport_attributes_complete():
-            #result += ["Reject"]
-        #else:
+        # Check if the entry record is complete
+        if valid_date_format(entry["birth_date"]) and valid_passport_format(
+                entry["passport"] and valid_reason_format(entry[
+                    "entry_reason"]) and valid_location_format(entry["home"],
+                                                               entry["from"])
+                and valid_name_format(entry["last_name"], entry["first_name"])):
+
             for country_key, country_val in country_list.items():
                 # Quarantine Scenario
                 if entry["from"]["country"].upper() == country_key and \
                         country_val["medical_advisory"]:
-                    mark = "Quarantine"
+                    mark = ["Quarantine"]
                 # Visit and Transit Scenario
                 elif entry["home"]["country"].upper() == country_key:
                     if int(country_val["vistor_visa_required"]) and \
@@ -66,11 +74,11 @@ def decide(input_file, watchlist_file, countries_file):
                             entry["entry_reason"] == "transit":
                         print("check transit visa")
 
-            if mark != "Quarantine":
+            if mark != ["Quarantine"]:
                 # check to see if is a returning citizen
                 if entry["entry_reason"] == "returning" and entry["home"][
                         "country"].upper() == "KAN":
-                    mark = "Accept"
+                    mark = ["Accept"]
 
                 # check to see if in watchlist
                 for info in watchlist:
@@ -79,34 +87,23 @@ def decide(input_file, watchlist_file, countries_file):
                                 "first_name"].upper() and entry[
                                     "last_name"].upper() == info[
                                         "last_name"].upper()):
-                        mark = "Secondary"
+                        mark = ["Secondary"]
 
             result += mark
             mark = ""
 
+        # return reject if entry record is not complete
+        else:
+            result += ["Reject"]
+
+    print(result)
     return result
 
-
-    return result
-
-
-def passport_attributes_complete(valid_passport_format, valid_date_format, valid_name_format, valid_location_format, valid_entry_format):
-    """
-
-    :param valid_passport_format:
-    :param valid_date_format:
-    :param valid_name_format:
-    :param valid_location_format:
-    :param valid_entry_format:
-    :return:
-    """
-    # Determines whether all attributes (First Name, Last Name, Birth Date, Passport Number, Home Location, From Location, Reason for Entry)
-    # are complete, returns True
-    # call valid_date_format and valid_passport_format
 
 def valid_passport_format(passport_number):
     """
-    Checks whether a passport number is five sets of five alpha-number characters separated by dashes
+    Checks whether a passport number is five sets of
+    five alpha-number characters separated by dashes
      :param passport_number: alpha-numeric string
     :return: Boolean; True if the format is valid, False otherwise
     """
@@ -115,11 +112,9 @@ def valid_passport_format(passport_number):
     if passport_format.match(passport_number):
         return True
     else:
+        print("Invalid passport format")
         return False
-    if type(passport_number) is not str:
-        raise TypeError("Invalid Type")
-    if len(passport_number) != 25:
-        raise ValueError("Incorrect length")
+
 
 def valid_date_format(date_string):
     """
@@ -132,10 +127,7 @@ def valid_date_format(date_string):
         return True
     except ValueError:
         return False
-    if type(date_string) is not str:
-        raise TypeError("Invalid Type")
-    if len(date_string) != 8:
-        raise ValueError("Incorrect length")
+
 
 def valid_name_format(first_name, last_name):
     """
@@ -145,16 +137,17 @@ def valid_name_format(first_name, last_name):
     :return: Boolean; True if valid, False otherwise
     """
 
-    if (len(first_name), len(last_name)) > 1 and (type(first_name), type(last_name)) != (str, str):
+    if (len(first_name), len(last_name)) > 1 and \
+                    (type(first_name), type(last_name)) != (str, str):
         return True
     else:
         return False
-    #if (type(first_name), type(last_name)) != (str, str):
-        #raise TypeError("Invalid Type: Names must be strings")
+
     if (first_name.isalpha()) and (last_name.isalpha()):
         return True
     else:
         return False
+
 
 def valid_location_format(home_location, from_location):
     """
@@ -164,19 +157,16 @@ def valid_location_format(home_location, from_location):
     :return: Boolean; True if valid, False otherwise
     """
 
-    preapproved_countries = ("ALB", "BRD", "CFR", "DSK", "ELE", "FRY", "GOR", "HJR",\
-                 "III", "JIK", "KAN", "KRA", "LUG")
-    if home_location in preapproved_countries:
-        return True
-    else:
-        return False
-    if from_location in preapproved_countries:
+    preapproved_countries = ("ALB", "BRD", "CFR", "DSK", "ELE", "FRY",
+                             "GOR", "HJR","III", "JIK", "KAN", "KRA", "LUG")
+    if home_location in preapproved_countries and \
+            from_location in preapproved_countries:
         return True
     else:
         return False
 
 
-def valid_entry_format(entry_reason):
+def valid_reason_format(entry_reason):
     """
     Checks whether reason for entry either returning, transit, or visa
     :param entry_reason: returning, transit, or visa
