@@ -55,17 +55,19 @@ def decide(input_file, watchlist_file, countries_file):
     for entry in test_file:
         # Check if the entry record is complete
         if valid_date_format(entry["birth_date"]) and valid_passport_format(
-                entry["passport"] and valid_reason_format(entry[
+                entry["passport"]) and valid_reason_format(entry[
                     "entry_reason"]) and valid_location_format(entry["home"],
-                                                               entry["from"])
-                and valid_name_format(entry["last_name"], entry["first_name"])):
+                                                               entry["from"])\
+                and valid_name_format(entry["first_name"], entry[
+                    "last_name"]):
 
+            # Check if entry record matches information in country_list
             for country_key, country_val in country_list.items():
-                # Quarantine Scenario
+                # Check if need quarantine
                 if entry["from"]["country"].upper() == country_key and \
                         country_val["medical_advisory"]:
                     mark = ["Quarantine"]
-                # Visit and Transit Scenario
+                # Check if need a valid transit or visit visa
                 elif entry["home"]["country"].upper() == country_key:
                     if int(country_val["vistor_visa_required"]) and \
                             entry["entry_reason"] == "visit":
@@ -75,12 +77,12 @@ def decide(input_file, watchlist_file, countries_file):
                         print("check transit visa")
 
             if mark != ["Quarantine"]:
-                # check to see if is a returning citizen
+                # Check to see if is a returning citizen
                 if entry["entry_reason"] == "returning" and entry["home"][
                         "country"].upper() == "KAN":
                     mark = ["Accept"]
 
-                # check to see if in watchlist
+                # check to see if entry record is in watchlist
                 for info in watchlist:
                     if entry["passport"].upper() == info["passport"].upper() \
                             or(entry["first_name"].upper() == info[
@@ -137,13 +139,7 @@ def valid_name_format(first_name, last_name):
     :return: Boolean; True if valid, False otherwise
     """
 
-    if (len(first_name), len(last_name)) > 1 and \
-                    (type(first_name), type(last_name)) != (str, str):
-        return True
-    else:
-        return False
-
-    if (first_name.isalpha()) and (last_name.isalpha()):
+    if first_name.isalpha() and last_name.isalpha():
         return True
     else:
         return False
@@ -159,8 +155,8 @@ def valid_location_format(home_location, from_location):
 
     preapproved_countries = ("ALB", "BRD", "CFR", "DSK", "ELE", "FRY",
                              "GOR", "HJR","III", "JIK", "KAN", "KRA", "LUG")
-    if home_location in preapproved_countries and \
-            from_location in preapproved_countries:
+    if home_location["country"].upper() in preapproved_countries and \
+            from_location["country"].upper() in preapproved_countries:
         return True
     else:
         return False
@@ -180,4 +176,4 @@ def valid_reason_format(entry_reason):
         return False
 
 
-decide("test_quarantine.json","watchlist.json","countries.json")
+#decide("test_quarantine.json","watchlist.json","countries.json")
