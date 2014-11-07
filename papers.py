@@ -54,6 +54,12 @@ def decide(input_file, watchlist_file, countries_file):
 
     for entry in test_file:
         # Check if the entry record is complete
+        print(valid_date_format(entry["birth_date"]), valid_passport_format(
+                entry["passport"]), valid_reason_format(entry[
+                    "entry_reason"]), valid_location_format(entry["home"],
+                                                               entry["from"]),
+              valid_name_format(entry["first_name"], entry[
+                    "last_name"]))
         if valid_date_format(entry["birth_date"]) and valid_passport_format(
                 entry["passport"]) and valid_reason_format(entry[
                     "entry_reason"]) and valid_location_format(entry["home"],
@@ -69,10 +75,10 @@ def decide(input_file, watchlist_file, countries_file):
                     mark = ["Quarantine"]
                 # Check if need a valid transit or visit visa
                 elif entry["home"]["country"].upper() == country_key:
-                    if int(country_val["vistor_visa_required"]) and \
+                    if country_val["visitor_visa_required"] == "1" and \
                             entry["entry_reason"] == "visit":
                         print("check visitor visa")
-                    elif int(country_val["transit_visa_required"])and \
+                    elif country_val["transit_visa_required"] == "1" and \
                             entry["entry_reason"] == "transit":
                         print("check transit visa")
 
@@ -153,8 +159,8 @@ def valid_location_format(home_location, from_location):
     :return: Boolean; True if valid, False otherwise
     """
 
-    preapproved_countries = ("ALB", "BRD", "CFR", "DSK", "ELE", "FRY",
-                             "GOR", "HJR","III", "JIK", "KAN", "KRA", "LUG")
+    preapproved_countries = ("ALB", "BRD", "CFR", "DSK", "ELE", "FRY", "GOR",
+                             "HJR", "III", "JIK", "KAN", "KRA", "LUG")
     if home_location["country"].upper() in preapproved_countries and \
             from_location["country"].upper() in preapproved_countries:
         return True
@@ -169,11 +175,8 @@ def valid_reason_format(entry_reason):
     :return: Boolean; True if valid, False otherwise
     """
 
-    reasons_for_entry = ("returning", "transit", "visa")
+    reasons_for_entry = ("returning", "transit", "visit")
     if entry_reason in reasons_for_entry:
         return True
     else:
         return False
-
-
-#decide("test_quarantine.json","watchlist.json","countries.json")
