@@ -65,9 +65,9 @@ def decide(input_file, watchlist_file, countries_file):
 
                 # Check if need a valid transit or visit visa
                 elif entry["home"]["country"].upper() == country_key:
-                    if (country_val["visitor_visa_required"] == "1" and \
+                    if (country_val["visitor_visa_required"] == "1" and
                         entry["entry_reason"] == "visit") or (country_val[
-                            "transit_visa_required"] == "1" and \
+                            "transit_visa_required"] == "1" and
                             entry["entry_reason"] == "transit"):
                         #if valid_date_format(entry["visa_date"]):
                         if (datetime.datetime.today() - datetime.datetime.
