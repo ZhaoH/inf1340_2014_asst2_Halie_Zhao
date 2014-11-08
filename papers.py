@@ -32,34 +32,23 @@ def decide(input_file, watchlist_file, countries_file):
     mark = ""
     result = []
 
+    #read test_file, watchlist, country_list from JSON files
     try:
         with open(input_file) as file_reader:
             test_file = file_reader.read()
             test_file = json.loads(test_file)
-            print(test_file)
-            print(type(test_file))
         with open(watchlist_file) as file_reader:
             watchlist = file_reader.read()
             watchlist = json.loads(watchlist)
-            print(watchlist)
-            print(type(watchlist))
         with open(countries_file) as file_reader:
             country_list = file_reader.read()
             country_list = json.loads(country_list)
-            print(country_list)
-            print(type(country_list))
     except:
         print("File not found")
         raise FileNotFoundError
 
     for entry in test_file:
         # Check if the entry record is complete
-        print(valid_date_format(entry["birth_date"]), valid_passport_format(
-                entry["passport"]), valid_reason_format(entry[
-                    "entry_reason"]), valid_location_format(entry["home"],
-                                                               entry["from"]),
-              valid_name_format(entry["first_name"], entry[
-                    "last_name"]))
         if valid_date_format(entry["birth_date"]) and valid_passport_format(
                 entry["passport"]) and valid_reason_format(entry[
                     "entry_reason"]) and valid_location_format(entry["home"],
@@ -73,14 +62,23 @@ def decide(input_file, watchlist_file, countries_file):
                 if entry["from"]["country"].upper() == country_key and \
                         country_val["medical_advisory"]:
                     mark = ["Quarantine"]
+
                 # Check if need a valid transit or visit visa
                 elif entry["home"]["country"].upper() == country_key:
-                    if country_val["visitor_visa_required"] == "1" and \
-                            entry["entry_reason"] == "visit":
-                        print("check visitor visa")
-                    elif country_val["transit_visa_required"] == "1" and \
-                            entry["entry_reason"] == "transit":
-                        print("check transit visa")
+                    if (country_val["visitor_visa_required"] == "1" and \
+                        entry["entry_reason"] == "visit") or (country_val[
+                            "transit_visa_required"] == "1" and \
+                            entry["entry_reason"] == "transit"):
+                        #if valid_date_format(entry["visa_date"]):
+                        if (datetime.datetime.today() - datetime.datetime.
+                                strptime(entry["visa_date"], "%Y-%m-%d")) < \
+                                datetime.timedelta(730):
+                            mark = ["Accept"]
+                        else:
+                            mark = ["Reject"]
+                    else :
+                        mark = ["Accept"]
+
 
             if mark != ["Quarantine"]:
                 # Check to see if is a returning citizen
@@ -104,7 +102,6 @@ def decide(input_file, watchlist_file, countries_file):
         else:
             result += ["Reject"]
 
-    print(result)
     return result
 
 
@@ -120,7 +117,6 @@ def valid_passport_format(passport_number):
     if passport_format.match(passport_number):
         return True
     else:
-        print("Invalid passport format")
         return False
 
 
