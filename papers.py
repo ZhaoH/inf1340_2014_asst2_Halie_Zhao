@@ -73,7 +73,7 @@ def decide(input_file, watchlist_file, countries_file):
                             mark = ["Accept"]
                         else:
                             mark = ["Reject"]
-                    else :
+                    else:
                         mark = ["Accept"]
 
 
@@ -109,7 +109,7 @@ def valid_passport_format(passport_number):
      :param passport_number: alpha-numeric string
     :return: Boolean; True if the format is valid, False otherwise
     """
-    #passport_format = re.compile('.{5}-.{5}-.{5}-.{5}-.{5}')
+
     passport_format = re.compile('^\w{5}-\w{5}-\w{5}-\w{5}-\w{5}$')
 
     if passport_format.match(passport_number):
@@ -126,6 +126,7 @@ def valid_visa(visa):
     :return: Boolean; True if the format is valid and not expired,
     False otherwise
     """
+
     visa_format = re.compile('^\w{5}-\w{5}$')
 
     if visa_format.match(visa["code"]) and \
@@ -143,6 +144,7 @@ def valid_date_format(date_string):
     :param date_string: date to be checked
     :return: Boolean True if the format is valid, False otherwise
     """
+
     try:
         datetime.datetime.strptime(date_string, '%Y-%m-%d')
         return True
