@@ -27,7 +27,7 @@ def test_basic():
                                         "Reject", "Reject", "Reject"]
     assert decide("test_visitor.json", "watchlist.json",
                   "countries.json") == ["Accept", "Accept", "Accept",
-                                        "Accept", "Accept"]
+                                        "Accept", "Accept", "Reject", "Reject"]
 
 def test_files():
     with pytest.raises(FileNotFoundError):
