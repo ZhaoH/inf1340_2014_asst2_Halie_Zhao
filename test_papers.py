@@ -21,7 +21,7 @@ def test_basic():
     assert decide("test_watchlist.json", "watchlist.json",
                   "countries.json") == ["Secondary"]
     assert decide("test_quarantine.json", "watchlist.json",
-                  "countries.json") == ["Quarantine"]
+                  "countries.json") == ["Quarantine", "Quarantine"]
     assert decide("test_reject.json", "watchlist.json",
                   "countries.json") == ["Reject", "Reject", "Reject",
                                         "Reject", "Reject", "Reject", "Reject",
