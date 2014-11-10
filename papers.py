@@ -32,7 +32,7 @@ def decide(input_file, watchlist_file, countries_file):
     mark = ""
     result = []
 
-    #read test_file, watchlist, country_list from JSON files
+    #Read test_file, watchlist, country_list from JSON files
     try:
         with open(input_file) as file_reader:
             test_file = file_reader.read()
@@ -62,7 +62,7 @@ def decide(input_file, watchlist_file, countries_file):
                         country_val["medical_advisory"]:
                     mark = ["Quarantine"]
 
-                # Check if need a valid transit or visit visa
+                # Check if traveller needs a valid transit or visit visa
                 elif entry["home"]["country"].upper() == country_key:
                     if (country_val["visitor_visa_required"] == "1" and
                         entry["entry_reason"] == "visit") or (country_val[
@@ -78,12 +78,12 @@ def decide(input_file, watchlist_file, countries_file):
 
 
             if mark != ["Quarantine"]:
-                # Check to see if is a returning citizen
+                # Check to see if traveller is a returning citizen
                 if entry["entry_reason"] == "returning" and \
                                 entry["home"]["country"].upper() == "KAN":
                     mark = ["Accept"]
 
-                # check to see if entry record is in watchlist
+                # Check to see if entry record is in watchlist
                 for info in watchlist:
                     if entry["passport"].upper() == info["passport"].upper()\
                             or(entry["first_name"].upper() == info[
@@ -95,7 +95,7 @@ def decide(input_file, watchlist_file, countries_file):
             result += mark
             mark = ""
 
-        # return reject if entry record is not complete
+        # Return reject if entry record is not complete
         else:
             result += ["Reject"]
 
@@ -109,7 +109,7 @@ def valid_passport_format(passport_number):
      :param passport_number: alpha-numeric string
     :return: Boolean; True if the format is valid, False otherwise
     """
-
+    # Checks to see if passport number is correct format
     passport_format = re.compile('^\w{5}-\w{5}-\w{5}-\w{5}-\w{5}$')
 
     if passport_format.match(passport_number):
@@ -126,7 +126,7 @@ def valid_visa(visa):
     :return: Boolean; True if the format is valid and not expired,
     False otherwise
     """
-
+    # Checks to see if visa is correct format
     visa_format = re.compile('^\w{5}-\w{5}$')
 
     if visa_format.match(visa["code"]) and \
@@ -144,7 +144,7 @@ def valid_date_format(date_string):
     :param date_string: date to be checked
     :return: Boolean True if the format is valid, False otherwise
     """
-
+    # Checks to see if date is in correct format
     try:
         datetime.datetime.strptime(date_string, '%Y-%m-%d')
         return True
@@ -154,12 +154,12 @@ def valid_date_format(date_string):
 
 def valid_name_format(first_name, last_name):
     """
-    Checks whether first name and last name are both complete strings and both use alphabetical characters
+    Checks whether first name and last name both use alphabetical characters
     :param first_name: alphabetical string
     :param last_name: alphabetical string
     :return: Boolean; True if valid, False otherwise
     """
-
+    # Checks to see if first an last name are in correct alphabetical character format
     if first_name.isalpha() and last_name.isalpha():
         return True
     else:
@@ -173,7 +173,7 @@ def valid_location_format(home_location, from_location):
     :param from_location: predetermined 3-letter country code
     :return: Boolean; True if valid, False otherwise
     """
-
+    # Checks to see whether both the home country and from country are on the preapproved list of countries
     preapproved_countries = ("ALB", "BRD", "CFR", "DSK", "ELE", "FRY", "GOR",
                              "HJR", "III", "JIK", "KAN", "KRA", "LUG")
     if home_location["country"].upper() in preapproved_countries and \
@@ -189,7 +189,7 @@ def valid_reason_format(entry_reason):
     :param entry_reason: returning, transit, or visa
     :return: Boolean; True if valid, False otherwise
     """
-
+    # Checks to see whether entry reason returning, transit, or visit
     reasons_for_entry = ("returning", "transit", "visit")
     if entry_reason in reasons_for_entry:
         return True
