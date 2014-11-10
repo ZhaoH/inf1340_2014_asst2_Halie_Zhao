@@ -49,12 +49,11 @@ def decide(input_file, watchlist_file, countries_file):
 
     for entry in test_file:
         # Check if the entry record is complete
-        if valid_date_format(entry["birth_date"]) and valid_passport_format(
-                entry["passport"]) and valid_reason_format(entry[
-                    "entry_reason"]) and valid_location_format(entry["home"],
-                                                               entry["from"])\
-                and valid_name_format(entry["first_name"], entry[
-                    "last_name"]):
+        if valid_date_format(entry["birth_date"]) and \
+                valid_passport_format(entry["passport"]) and \
+                valid_reason_format(entry["entry_reason"]) and \
+                valid_location_format(entry["home"], entry["from"])and \
+                valid_name_format(entry["first_name"], entry["last_name"]):
 
             # Check if entry record matches information in country_list
             for country_key, country_val in country_list.items():
@@ -69,10 +68,8 @@ def decide(input_file, watchlist_file, countries_file):
                         entry["entry_reason"] == "visit") or (country_val[
                             "transit_visa_required"] == "1" and
                             entry["entry_reason"] == "transit"):
-                        #check if visa is less than two years old
-                        if (datetime.datetime.today() - datetime.datetime.
-                                strptime(entry["visa_date"], "%Y-%m-%d")) < \
-                                datetime.timedelta(730):
+                        # Check if the visa is valid
+                        if valid_visa(entry["visa"]):
                             mark = ["Accept"]
                         else:
                             mark = ["Reject"]
@@ -82,17 +79,17 @@ def decide(input_file, watchlist_file, countries_file):
 
             if mark != ["Quarantine"]:
                 # Check to see if is a returning citizen
-                if entry["entry_reason"] == "returning" and entry["home"][
-                        "country"].upper() == "KAN":
+                if entry["entry_reason"] == "returning" and \
+                                entry["home"]["country"].upper() == "KAN":
                     mark = ["Accept"]
 
                 # check to see if entry record is in watchlist
                 for info in watchlist:
-                    if entry["passport"].upper() == info["passport"].upper() \
+                    if entry["passport"].upper() == info["passport"].upper()\
                             or(entry["first_name"].upper() == info[
-                                "first_name"].upper() and entry[
-                                    "last_name"].upper() == info[
-                                        "last_name"].upper()):
+                                "first_name"].upper() and
+                                entry["last_name"].upper() == info[
+                            "last_name"].upper()):
                         mark = ["Secondary"]
 
             result += mark
@@ -112,10 +109,30 @@ def valid_passport_format(passport_number):
      :param passport_number: alpha-numeric string
     :return: Boolean; True if the format is valid, False otherwise
     """
-    passport_format = re.compile('.{5}-.{5}-.{5}-.{5}-.{5}')
+    #passport_format = re.compile('.{5}-.{5}-.{5}-.{5}-.{5}')
+    passport_format = re.compile('^\w{5}-\w{5}-\w{5}-\w{5}-\w{5}$')
 
     if passport_format.match(passport_number):
         return True
+    else:
+        return False
+
+
+def valid_visa(visa):
+    """
+    Checks whether a visa data is two sets of five alpha-number characters
+    separated by dashes and is less than two years old
+     :param visa: alpha-numeric string
+    :return: Boolean; True if the format is valid and not expired,
+    False otherwise
+    """
+    visa_format = re.compile('^\w{5}-\w{5}$')
+
+    if visa_format.match(visa["code"]) and \
+        (datetime.datetime.today() - datetime.datetime.strptime(visa["date"],
+                                                                "%Y-%m-%d")) \
+            < datetime.timedelta(730):
+            return True
     else:
         return False
 
