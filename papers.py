@@ -76,7 +76,6 @@ def decide(input_file, watchlist_file, countries_file):
                     else:
                         mark = ["Accept"]
 
-
             if mark != ["Quarantine"]:
                 # Check to see if traveller is a returning citizen
                 if entry["entry_reason"] == "returning" and \
@@ -129,11 +128,14 @@ def valid_visa(visa):
     # Checks to see if visa is correct format
     visa_format = re.compile('^\w{5}-\w{5}$')
 
-    if visa_format.match(visa["code"]) and \
-        (datetime.datetime.today() - datetime.datetime.strptime(visa["date"],
-                                                                "%Y-%m-%d")) \
-            < datetime.timedelta(730):
+    # Check if the visa is in valid format
+    if visa_format.match(visa["code"]) and valid_date_format(visa["date"]):
+        # Check if the visa is less than 2 years old
+        if (datetime.datetime.today() - datetime.datetime.strptime(
+                visa["date"], "%Y-%m-%d")) < datetime.timedelta(730):
             return True
+        else:
+            return False
     else:
         return False
 
@@ -159,7 +161,8 @@ def valid_name_format(first_name, last_name):
     :param last_name: alphabetical string
     :return: Boolean; True if valid, False otherwise
     """
-    # Checks to see if first an last name are in correct alphabetical character format
+    # Checks to see if first an last name are in correct alphabetical
+    # character format
     if first_name.isalpha() and last_name.isalpha():
         return True
     else:
@@ -168,12 +171,14 @@ def valid_name_format(first_name, last_name):
 
 def valid_location_format(home_location, from_location):
     """
-    Checks whether home location and from location are on list of existing countries
+    Checks whether home location and from location are on list of existing
+    countries
     :param home_location: predetermined 3-letter country code
     :param from_location: predetermined 3-letter country code
     :return: Boolean; True if valid, False otherwise
     """
-    # Checks to see whether both the home country and from country are on the preapproved list of countries
+    # Checks to see whether both the home country and from country are on the
+    # preapproved list of countries
     preapproved_countries = ("ALB", "BRD", "CFR", "DSK", "ELE", "FRY", "GOR",
                              "HJR", "III", "JIK", "KAN", "KRA", "LUG")
     if home_location["country"].upper() in preapproved_countries and \
