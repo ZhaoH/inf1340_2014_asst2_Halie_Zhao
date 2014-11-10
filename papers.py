@@ -69,7 +69,7 @@ def decide(input_file, watchlist_file, countries_file):
                         entry["entry_reason"] == "visit") or (country_val[
                             "transit_visa_required"] == "1" and
                             entry["entry_reason"] == "transit"):
-                        #if valid_date_format(entry["visa_date"]):
+                        #check if visa is less than two years old
                         if (datetime.datetime.today() - datetime.datetime.
                                 strptime(entry["visa_date"], "%Y-%m-%d")) < \
                                 datetime.timedelta(730):
